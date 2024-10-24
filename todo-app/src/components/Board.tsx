@@ -1,10 +1,14 @@
 import { useState } from 'react'
-import Draggable from './Draggable';
-import { DndContext, DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import Droppable from './Droppable';
+import TodoItem from '../models/TodoItem';
 
-const Board = () => {
-    const [parent, setParent] = useState<UniqueIdentifier | null>(null);
+interface Props {
+    class?: string
+};
+
+const Board = (props: Props) => {
+    const [items, setItems] = useState<TodoItem[]>();
 
     const lists = [
         "todo",
@@ -12,24 +16,27 @@ const Board = () => {
         "completed"
     ];
 
-    const draggable = (
-        <Draggable id="draggable">
-          Go ahead, drag me.
-        </Draggable>
-    );
+    const dragEnd = (item: DragEndEvent) => {
+        console.log(item);
+    };
+
+    const addItem = (newItem: TodoItem) => {
+        setItems((prevItems = []) => [...prevItems, newItem])
+
+        return newItem;
+    };
 
     return (
         <>
-            <DndContext onDragEnd={(item: DragEndEvent) => setParent(item.over ? item.over.id : null)}>
-                {!parent ? draggable : null}
-                {lists.map((listName) => {
-                    return (
-                        <Droppable id={listName}>
-                            {parent === listName ? draggable : 'Drop here'}
+            <div className={props.class}>
+                <DndContext onDragEnd={dragEnd}>
+                    {lists.map((listName) =>
+                        <Droppable listName={listName} key={listName} class='d-flex flex-column border p-1 h-100' addItem={addItem}>
+                            {items?.filter(item => item.listName === listName).map(item => item.element)}
                         </Droppable>
-                    );
-                })}
-            </DndContext>
+                    )}
+                </DndContext>
+            </div>
         </>
     )
 };

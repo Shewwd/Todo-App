@@ -3,7 +3,7 @@ import Board from "./components/Board";
 const App = () => {
 
     return (
-        <Board/>
+        <Board class="d-flex flex-direction-row h-100 "/>
     );
 };
 

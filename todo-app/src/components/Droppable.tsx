@@ -1,21 +1,38 @@
 import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import TodoItem from "../models/TodoItem";
+import Draggable from "./Draggable";
 
 interface Props extends React.PropsWithChildren {
-    id: UniqueIdentifier
+    listName: UniqueIdentifier,
+    class?: string,
+    addItem: (newItem: TodoItem) => void
 }
 
 const Droppable = (props: Props) => {
     const {isOver, setNodeRef} = useDroppable({
-        id: props.id,
+        id: props.listName,
     });
 
-    const style = {
-        opacity: isOver ? 1 : 0.5,
+    const addItem = () => {
+        const newItem: TodoItem = {
+            listName: props.listName,
+            element: (
+                <Draggable id='draggable'>
+                    This is a test
+                </Draggable>
+            )
+        };
+
+        props.addItem(newItem);
     };
     
     return (
-        <div ref={setNodeRef} style={style}>
-            {props.children}
+        <div>
+            {props.listName}
+            <div ref={setNodeRef} style={{ opacity: isOver ? 1 : 0.5 }} className={props.class}>
+                <button onClick={() => {addItem()}}>Add Item</button>
+                {props.children}
+            </div>
         </div>
     );
 };
