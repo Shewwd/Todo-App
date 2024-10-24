@@ -11,13 +11,8 @@ const Draggable = (props: Props) => {
         id: props.id,
     });
 
-    const style = {
-        // Outputs `translate3d(x, y, 0)`
-        transform: CSS.Translate.toString(transform),
-    };
-
     return (
-        <button ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <button key={props.id}  ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform) }} {...listeners} {...attributes}>
             {props.children}
         </button>
     );

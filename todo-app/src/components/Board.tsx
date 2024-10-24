@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import Droppable from './Droppable';
 import TodoItem from '../models/TodoItem';
+import Draggable from './Draggable';
 
 interface Props {
-    class?: string
+    class?: string,
+    numItems: number,
+    setNumItems: (num: number) => void
 };
 
 const Board = (props: Props) => {
-    const [items, setItems] = useState<TodoItem[]>();
+    const [items, setItems] = useState<TodoItem[]>([]);
 
     const lists = [
         "todo",
@@ -16,11 +19,36 @@ const Board = (props: Props) => {
         "completed"
     ];
 
-    const dragEnd = (item: DragEndEvent) => {
-        console.log(item);
+    const dragEnd = (event: DragEndEvent) => {
+        const itemIdx = parseInt(event.active.id.toString()) - 1;
+    
+        // Create a new array by mapping over the current items and updating the dragged item
+        const newItemList = items.map((item, index) => {
+            if (index === itemIdx) {
+                return {
+                    ...item, // Copy the existing item properties
+                    listName: event.over?.id as UniqueIdentifier // Update the list name
+                };
+            }
+            return item;
+        });
+    
+        // Set the updated array in state
+        setItems(newItemList);
     };
+    
 
-    const addItem = (newItem: TodoItem) => {
+    const addItem = (listName: UniqueIdentifier) => {
+        const newItem: TodoItem = {
+            listName: listName,
+            element: (
+                <Draggable id={props.numItems} key={props.numItems}>
+                    This is Todo list item {props.numItems}
+                </Draggable>
+            )
+        };
+
+        props.setNumItems(props.numItems + 1);
         setItems((prevItems = []) => [...prevItems, newItem])
 
         return newItem;
