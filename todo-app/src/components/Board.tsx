@@ -1,23 +1,37 @@
-import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import { useState } from 'react'
+import Draggable from './Draggable';
+import { DndContext, DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
+import Droppable from './Droppable';
 
-interface Props extends React.PropsWithChildren {
-    id: UniqueIdentifier
-}
+const Board = () => {
+    const [parent, setParent] = useState<UniqueIdentifier | null>(null);
 
-const Board = (props: Props) => {
-    const {isOver, setNodeRef} = useDroppable({
-        id: props.id,
-    });
+    const lists = [
+        "todo",
+        "inprogress",
+        "completed"
+    ];
 
-    const style = {
-        opacity: isOver ? 1 : 0.5,
-    };
-    
-    return (
-        <div ref={setNodeRef} style={style}>
-            {props.children}
-        </div>
+    const draggable = (
+        <Draggable id="draggable">
+          Go ahead, drag me.
+        </Draggable>
     );
+
+    return (
+        <>
+            <DndContext onDragEnd={(item: DragEndEvent) => setParent(item.over ? item.over.id : null)}>
+                {!parent ? draggable : null}
+                {lists.map((listName) => {
+                    return (
+                        <Droppable id={listName}>
+                            {parent === listName ? draggable : 'Drop here'}
+                        </Droppable>
+                    );
+                })}
+            </DndContext>
+        </>
+    )
 };
 
 export default Board;
