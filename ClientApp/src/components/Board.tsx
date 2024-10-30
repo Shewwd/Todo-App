@@ -5,7 +5,6 @@ import TodoItem from '../models/TodoItem';
 import Draggable from './Draggable';
 
 interface Props {
-    class?: string,
     numItems: number,
     setNumItems: (num: number) => void
 };
@@ -14,26 +13,24 @@ const Board = (props: Props) => {
     const [items, setItems] = useState<TodoItem[]>([]);
 
     const lists = [
-        "todo",
-        "inprogress",
-        "completed"
+        "Todo",
+        "In Progress",
+        "Completed"
     ];
 
     const dragEnd = (event: DragEndEvent) => {
         const itemIdx = parseInt(event.active.id.toString()) - 1;
     
-        // Create a new array by mapping over the current items and updating the dragged item
         const newItemList = items.map((item, index) => {
             if (index === itemIdx) {
                 return {
-                    ...item, // Copy the existing item properties
-                    listName: event.over?.id as UniqueIdentifier // Update the list name
+                    ...item,
+                    listName: event.over?.id as UniqueIdentifier
                 };
             }
             return item;
         });
     
-        // Set the updated array in state
         setItems(newItemList);
     };
     
@@ -55,17 +52,15 @@ const Board = (props: Props) => {
     };
 
     return (
-        <>
-            <div className={props.class}>
-                <DndContext onDragEnd={dragEnd}>
-                    {lists.map((listName) =>
-                        <Droppable listName={listName} key={listName} class='d-flex flex-column border p-1 h-100' addItem={addItem}>
-                            {items?.filter(item => item.listName === listName).map(item => item.element)}
-                        </Droppable>
-                    )}
-                </DndContext>
-            </div>
-        </>
+        <div className='d-flex mx-auto'>
+            <DndContext onDragEnd={dragEnd}>
+                {lists.map((listName) =>
+                    <Droppable listName={listName} addItem={addItem} key={listName}>
+                        {items?.filter(item => item.listName === listName).map(item => item.element)}
+                    </Droppable>
+                )}
+            </DndContext>
+        </div>
     )
 };
 

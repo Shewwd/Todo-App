@@ -12,7 +12,7 @@ const Draggable = (props: Props) => {
     });
 
     return (
-        <button key={props.id}  ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform) }} {...listeners} {...attributes}>
+        <button className='btn btn-outline-primary' style={{ transform: CSS.Translate.toString(transform) }} key={props.id} ref={setNodeRef} {...listeners} {...attributes}>
             {props.children}
         </button>
     );
