@@ -5,14 +5,14 @@ interface Props extends React.PropsWithChildren {
     addItem: (listName: UniqueIdentifier) => void
 }
 
-const Droppable = (props: Props) => {
+const DroppableList = (props: Props) => {
     const {setNodeRef} = useDroppable({
         id: props.listName,
     });
     
     return (
-        <div className='d-flex flex-column col m-4'>
-            <div className='pb-2 text-center'>
+        <div className='d-flex flex-column col m-2'>
+            <div className='text-center'>
                 <h3 className='text-uppercase text-muted'>{props.listName}</h3>
             </div>
             <div className='d-flex flex-column flex-grow-1 p-3 border rounded-3 shadow-sm bg-light' ref={setNodeRef}>
@@ -23,4 +23,4 @@ const Droppable = (props: Props) => {
     );
 };
 
-export default Droppable;
+export default DroppableList;
