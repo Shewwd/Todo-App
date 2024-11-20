@@ -1,8 +1,9 @@
 import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import { Button } from "react-bootstrap";
 
 interface Props extends React.PropsWithChildren {
     listName: UniqueIdentifier,
-    addItem: (listName: UniqueIdentifier) => void
+    addItemModalTrigger: () => void
 }
 
 const DroppableList = (props: Props) => {
@@ -16,7 +17,7 @@ const DroppableList = (props: Props) => {
                 <h3 className='text-uppercase text-muted'>{props.listName}</h3>
             </div>
             <div className='d-flex flex-column flex-grow-1 p-3 border rounded-3 shadow-sm bg-light' ref={setNodeRef}>
-                <button onClick={() => {props.addItem(props.listName)}} className='btn btn-sm btn-outline-secondary mb-2 px-5'>Add Item</button>
+                <Button onClick={() => {props.addItemModalTrigger()}} className='btn-sm mb-2 px-5'>Add Item</Button>
                 {props.children}
             </div>
         </div>
