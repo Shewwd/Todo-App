@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,11 +11,29 @@ import (
 )
 
 type TodoItem struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID          int    `json:"ID"`
+	Name        string `json:"Name"`
+	Description string `json:"Description"`
 }
 
 var todoItems []TodoItem
+
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow all origins (you can restrict this to your frontend's origin)
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle preflight request
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	router := mux.NewRouter()
@@ -25,7 +44,8 @@ func main() {
 	router.HandleFunc("/todoitem/{id}", updateTodoItem).Methods("PUT")
 	router.HandleFunc("/todoitem/{id}", deleteTodoItem).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	fmt.Println("Listening on Port 8080")
+	log.Fatal(http.ListenAndServe(":8080", enableCORS(router)))
 }
 
 // Create a TODO item
@@ -33,7 +53,7 @@ func createTodoItem(w http.ResponseWriter, r *http.Request) {
 	var newTodo TodoItem
 
 	err := json.NewDecoder(r.Body).Decode(&newTodo)
-	if err != nil || newTodo.Name == "" {
+	if err != nil || newTodo.Name == "" || newTodo.Description == "" {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}

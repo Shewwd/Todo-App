@@ -1,11 +1,9 @@
-import { useState } from "react";
-import Board from "./components/Board";
+import TodoList from "./components/TodoList";
 
 const App = () => {
-    const [numItems, setNumItems] = useState(1);
 
     return (
-        <Board numItems={numItems} setNumItems={(num: number) => setNumItems(num)}/>
+        <TodoList />
     );
 };
 
