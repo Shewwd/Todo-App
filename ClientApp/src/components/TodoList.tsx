@@ -72,7 +72,7 @@ const TodoList = () => {
                 <div className='d-flex flex-column flex-grow-1 p-3 border rounded-3 shadow-sm bg-light'>
                     <Button onClick={() => {setShowAddItemModal(true)}} className='btn mb-2 px-5'>Add Item</Button>
                     <div className='d-flex flex-column gap-2'>
-                        {items.map(item => 
+                        {items?.map(item => 
                             <TodoItemCard item={item} deleteItem={DeleteItem} key={`todo-item-${item.ID}`} />
                         )}
                     </div>
