@@ -12,18 +12,19 @@ const AddItemModal = (props: Props) => {
     const [name, setName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
 
-    const clearForm = () => {
+    function clearForm() {
         setName("");
         setDescription("");
     }
 
-    const handleClose = () => {
+    function handleClose() {
         clearForm();
         props.close();
     };
 
-    const handleSave = () => {
-        // Input validation
+    function handleSave(event: React.FormEvent) {
+        event.preventDefault();  // Prevent page reload
+
         if (name.trim() === "") {
             alert("Item Name is required.");
             return;
@@ -34,16 +35,10 @@ const AddItemModal = (props: Props) => {
             return;
         }
 
-        // Create new TodoItem
-        const item: TodoItem = {
-            ID: -1, // Placeholder ID; real ID will be assigned in the backend
-            Name: name!,
-            Description: description!
-        };
+        const item = new TodoItem(-1, name!, description!);
 
-        // Pass the new item to the parent and reset state
         props.saveItem(item);
-        handleClose(); // Close modal after saving
+        handleClose();
     };
 
 
@@ -57,11 +52,11 @@ const AddItemModal = (props: Props) => {
                     
                     <Form.Group className="mb-3" controlId="formName">
                             <Form.Label>Item Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Item Name" value={name} onChange={(e) => setName(e.target.value)} />
+                            <Form.Control required type="text" placeholder="Enter Item Name" value={name} onChange={(e) => setName(e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formDescription">
                             <Form.Label>Item Description</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Item Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                            <Form.Control required type="text" placeholder="Enter Item Description" value={description} onChange={(e) => setDescription(e.target.value)} />
                         </Form.Group>
                     
                 </Modal.Body>

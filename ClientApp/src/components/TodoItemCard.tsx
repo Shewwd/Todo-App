@@ -2,25 +2,25 @@ import { Accordion, Button } from "react-bootstrap";
 import TodoItem from "../models/TodoItem";
 
 interface Props {
-    item: TodoItem,
-    deleteItem: (id: number) => void
+    todoItem: TodoItem,
+    deleteTodoItem: (id: number) => void
 }
 
 const TodoItemCard = (props: Props) => {
 
-    const handleDelete = () => {
+    function handleDelete() {
         if(confirm("Are you sure you want to delete this Todo Item?"))
-            props.deleteItem(props.item.ID);
+            props.deleteTodoItem(props.todoItem.ID);
     }
 
     return (
         <Accordion>
             <Accordion.Header className="border">
-                {props.item.Name}
+                {props.todoItem.Name}
             </Accordion.Header>
             <Accordion.Body className="border">
                 <div>
-                    {props.item.Description}
+                    {props.todoItem.Description}
                 </div>
                 <div className="d-inline-flex w-100">
                     <Button className="btn-sm ms-auto" onClick={handleDelete}>Delete</Button>

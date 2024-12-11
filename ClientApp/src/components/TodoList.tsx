@@ -1,69 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import TodoItem from '../models/TodoItem';
 import AddItemModal from './AddItemModal';
 import { Button } from 'react-bootstrap';
 import TodoItemCard from './TodoItemCard';
+import { AppContext } from '../AppContext';
 
 const TodoList = () => {
-    const [items, setItems] = useState<TodoItem[]>([]);
+    const context = useContext(AppContext);
+    const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
     const [showAddItemModal, setShowAddItemModal] = useState(false);
 
     useEffect(() => {
         GetTodoItems();   
-    }, [])
+    })
 
-    const CreateTodoItem = async (item: TodoItem) => {
+    async function GetTodoItems() {
         try {
-            const response = await fetch('http://localhost:8080/todoitem', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(item)
-            });
-            if (!response.ok) {
-              throw new Error(`Response status: ${response.status}`);
-            }
-        
-            const newItem: TodoItem = await response.json();
-            setItems((prevItems) => [...prevItems, newItem]);
-          } catch {
-            console.error(`Error Creating Todo Item`);
-          }        
-    }
-
-    const GetTodoItems = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/todoitem');
-            if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
-            }
-
-            const items: TodoItem[] = await response.json();
-            setItems(items);
-        } catch {
-            console.error('Error Getting Todo Items')
+            const items = await TodoItem.GetTodoItems(context.DataProvider);
+            setTodoItems(items);
+        } catch (error) {
+            console.error('Error Getting Todo Items:', error)
         }
     }
 
-    const DeleteItem = async (id: number) => {
+    async function handleCreateTodoItem(newItem: TodoItem) {
         try {
-            const response = await fetch(`http://localhost:8080/todoitem/${id}`, {
-                method: "DELETE"
-            });
-            if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
-            }
+            newItem = await TodoItem.CreateTodoItem(newItem, context.DataProvider);
+            setTodoItems((prevItems) => [...prevItems, newItem]);
+        } catch (error) {
+            console.error("Error Creating Todo Item:", error);
+        }        
+    }
 
-            setItems(items.filter((item) => {return item.ID !== id}));
-        } catch {
-            console.error('Error Getting Todo Items')
+    async function handleDeleteTodoItem(id: number) {
+        try {
+            await TodoItem.DeleteItem(id, context.DataProvider);
+            setTodoItems(todoItems.filter((todoItem) => {return todoItem.ID !== id}));
+        } catch(error) {
+            console.error('Error Deleting Todo Item:', error)
         }
     }
 
     return (
         <div className='d-flex flex-grow-1'>
-            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={CreateTodoItem}></AddItemModal>
+            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={handleCreateTodoItem}></AddItemModal>
 
             <div className='d-flex flex-column col m-2'>
                 <div className='text-center'>
@@ -72,8 +52,8 @@ const TodoList = () => {
                 <div className='d-flex flex-column flex-grow-1 p-3 border rounded-3 shadow-sm bg-light'>
                     <Button onClick={() => {setShowAddItemModal(true)}} className='btn mb-2 px-5'>Add Item</Button>
                     <div className='d-flex flex-column gap-2'>
-                        {items?.map(item => 
-                            <TodoItemCard item={item} deleteItem={DeleteItem} key={`todo-item-${item.ID}`} />
+                        {todoItems?.map(todoItem => 
+                            <TodoItemCard todoItem={todoItem} deleteTodoItem={handleDeleteTodoItem} key={`todo-item-${todoItem.ID}`} />
                         )}
                     </div>
                 </div>
