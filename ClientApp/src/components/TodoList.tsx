@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
+import { AppContext } from '../AppContext';
+import { Button, Spinner } from 'react-bootstrap';
 import TodoItem from '../models/TodoItem';
 import AddItemModal from './AddItemModal';
-import { Button, Spinner } from 'react-bootstrap';
 import TodoItemCard from './TodoItemCard';
-import { AppContext } from '../AppContext';
 
 const TodoList = () => {
     const context = useContext(AppContext);
@@ -29,7 +29,7 @@ const TodoList = () => {
         }, 250);  // 500ms delay to ensure the spinner is visible for a bit
     }
 
-    async function handleCreateTodoItem(newItem: TodoItem) {
+    async function HandleCreateTodoItem(newItem: TodoItem) {
         try {
             await TodoItem.CreateTodoItem(newItem, context.DataProvider);
         } catch (error) {
@@ -38,7 +38,7 @@ const TodoList = () => {
         GetTodoItems();
     }
 
-    async function handleDeleteTodoItem(id: number) {
+    async function HandleDeleteTodoItem(id: number) {
         try {
             await TodoItem.DeleteItem(id, context.DataProvider);
         } catch(error) {
@@ -49,7 +49,7 @@ const TodoList = () => {
 
     return (
         <div className='d-flex flex-grow-1'>
-            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={handleCreateTodoItem}/>
+            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={HandleCreateTodoItem}/>
             <div className='d-flex flex-column col m-2'>
                 <div className='text-center'>
                     <h3 className='text-uppercase text-muted'>TODO</h3>
@@ -63,7 +63,7 @@ const TodoList = () => {
                         <>
                             <div className='d-flex flex-column gap-2'>
                                 {todoItems?.map(todoItem => 
-                                    <TodoItemCard todoItem={todoItem} deleteTodoItem={handleDeleteTodoItem} key={`todo-item-${todoItem.ID}`} />
+                                    <TodoItemCard todoItem={todoItem} deleteTodoItem={HandleDeleteTodoItem} key={`todo-item-${todoItem.ID}`} />
                                 )}
                             </div>
                             <Button onClick={() => {setShowAddItemModal(true)}} className='btn mt-auto px-5'>Add Item</Button>

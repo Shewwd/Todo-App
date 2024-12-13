@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import TodoItem from "../models/TodoItem";
-import { useState } from "react";
 
 interface Props {
     show: boolean,
