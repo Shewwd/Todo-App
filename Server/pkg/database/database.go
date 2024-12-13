@@ -68,6 +68,12 @@ func Insert(tableName string, input interface{}) (int64, error) {
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i)
 		dbTag := field.Tag.Get("db")
+
+		// Skip the 'id' field on creation
+		if dbTag == "id" {
+			continue
+		}
+
 		if dbTag == "" {
 			return 0, fmt.Errorf("Struct Field %s has no db tag")
 		}
