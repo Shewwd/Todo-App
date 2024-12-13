@@ -12,11 +12,12 @@ const TodoList = () => {
 
     useEffect(() => {
         GetTodoItems();
-    })
+    }, [])
 
     async function GetTodoItems() {
         try {
             const items = await TodoItem.GetTodoItems(context.DataProvider);
+            console.log('GetTodoItems', items)
             setTodoItems(items);
         } catch (error) {
             console.error('Error Getting Todo Items:', error)

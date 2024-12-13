@@ -6,7 +6,7 @@ const App = () => {
 
     return (
         <AppContext.Provider value={{
-            DataProvider: new DataProvider("http://localhost:8080"),
+            DataProvider: new DataProvider("http://localhost:8080/api"),
         }}>
             <TodoList />
         </AppContext.Provider>

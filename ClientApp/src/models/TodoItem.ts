@@ -6,7 +6,7 @@ export default class TodoItem {
 
     static async CreateTodoItem(item: TodoItem, dataProvider: DataProvider): Promise<TodoItem> {
         try {
-            return await dataProvider.Post<TodoItem>(this.endpoint, item);
+            return await dataProvider.Post<TodoItem>(`${this.endpoint}/create`, item);
         } catch (error) {
             throw new Error(`Error in creating TodoItem: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -14,7 +14,7 @@ export default class TodoItem {
 
     static async GetTodoItems(dataProvider: DataProvider): Promise<TodoItem[]> {
         try {
-            return await dataProvider.Get<TodoItem[]>(this.endpoint);
+            return await dataProvider.Get<TodoItem[]>(`${this.endpoint}/getall`);
         } catch (error) {
             throw new Error(`Error in getting TodoItems: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -22,7 +22,7 @@ export default class TodoItem {
 
     static async DeleteItem(id: number, dataProvider: DataProvider) {
         try {
-            await dataProvider.Delete(`${this.endpoint}/${id}`);
+            await dataProvider.Delete(`${this.endpoint}/delete/${id}`);
         } catch (error) {
             throw new Error(`Error in deleting TodoItem: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }

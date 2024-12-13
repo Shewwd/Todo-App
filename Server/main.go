@@ -4,17 +4,29 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/shewwd/Todo-App/pkg/database"
+	"github.com/shewwd/Todo-App/pkg/middleware"
 	"github.com/shewwd/Todo-App/pkg/router"
 )
 
 func main() {
 
-	database.InitDB()
+	err := database.Init()
+	if err != nil {
+		log.Fatalf("Failed to initialize the database: %v", err)
+	}
+	defer database.Close()
+	log.Println("Database successfully initialized")
 
-	router := router.InitRouter()
+	router := router.Init()
 
-	fmt.Println("Listening on Port 8080")
-	log.Fatal(http.ListenAndServe(":8080", middleware.enableCORS(router)))
+	// Start server
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	fmt.Printf("Listening on Port %s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, middleware.EnableCORS(router)))
 }
