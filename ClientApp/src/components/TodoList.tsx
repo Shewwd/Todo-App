@@ -11,7 +11,7 @@ const TodoList = () => {
     const [showAddItemModal, setShowAddItemModal] = useState(false);
 
     useEffect(() => {
-        GetTodoItems();   
+        GetTodoItems();
     })
 
     async function GetTodoItems() {
@@ -25,11 +25,11 @@ const TodoList = () => {
 
     async function handleCreateTodoItem(newItem: TodoItem) {
         try {
-            newItem = await TodoItem.CreateTodoItem(newItem, context.DataProvider);
-            setTodoItems((prevItems) => [...prevItems, newItem]);
+            const createdItem = await TodoItem.CreateTodoItem(newItem, context.DataProvider);
+            setTodoItems((prevItems) => [...prevItems, createdItem]);
         } catch (error) {
             console.error("Error Creating Todo Item:", error);
-        }        
+        }
     }
 
     async function handleDeleteTodoItem(id: number) {
@@ -43,8 +43,7 @@ const TodoList = () => {
 
     return (
         <div className='d-flex flex-grow-1'>
-            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={handleCreateTodoItem}></AddItemModal>
-
+            <AddItemModal show={showAddItemModal} close={() => setShowAddItemModal(false)} saveItem={handleCreateTodoItem}/>
             <div className='d-flex flex-column col m-2'>
                 <div className='text-center'>
                     <h3 className='text-uppercase text-muted'>TODO</h3>
@@ -57,7 +56,7 @@ const TodoList = () => {
                         )}
                     </div>
                 </div>
-            </div>          
+            </div>
         </div>
     )
 };

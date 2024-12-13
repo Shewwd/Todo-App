@@ -4,12 +4,10 @@ import { AppContext } from "./AppContext";
 
 const App = () => {
 
-    const appContextValue = {
-        DataProvider: new DataProvider("http://localhost:8080"),
-    }
-
     return (
-        <AppContext.Provider value={appContextValue}>
+        <AppContext.Provider value={{
+            DataProvider: new DataProvider("http://localhost:8080"),
+        }}>
             <TodoList />
         </AppContext.Provider>
     );

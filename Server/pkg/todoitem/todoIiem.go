@@ -1,20 +1,14 @@
-package main
+package todoitem
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"strconv"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
+	"github.com/shewwd/Todo-App/pkg/database"
 )
-
-var db *sql.DB
 
 type TodoItem struct {
 	ID          int64  `json:"ID"`
@@ -22,80 +16,20 @@ type TodoItem struct {
 	Description string `json:"Description"`
 }
 
-func enableCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Allow all origins (you can restrict this to your frontend's origin)
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		// Handle preflight request
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
-func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	router := mux.NewRouter()
-
-	// Define endpoints
-	router.HandleFunc("/todoitem", createTodoItem).Methods("POST")
-	router.HandleFunc("/todoitem", getTodoItems).Methods("GET")
-	router.HandleFunc("/todoitem/{id}", updateTodoItem).Methods("PUT")
-	router.HandleFunc("/todoitem/{id}", deleteTodoItem).Methods("DELETE")
-
-	fmt.Println("Listening on Port 8080")
-
-	// Capture connection properties
-	cfg := mysql.Config{
-		User:   os.Getenv("DBUSER"),
-		Passwd: os.Getenv("DBPASS"),
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "todo_db",
-	}
-
-	// Get a database handle
-	db, err = sql.Open("mysql", cfg.FormatDSN())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-
-	log.Fatal(http.ListenAndServe(":8080", enableCORS(router)))
-}
-
 // Create a TODO item
-func createTodoItem(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 	var newTodo TodoItem
-
 	err := json.NewDecoder(r.Body).Decode(&newTodo)
+
 	if err != nil || newTodo.Name == "" || newTodo.Description == "" {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	result, err := db.Exec("INSERT INTO todo_item (name, description) VALUES (?, ?)", newTodo.Name, newTodo.Description)
+	id, err := database.Insert("todo_item", newTodo)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error adding new Todo item: %v", err), http.StatusBadRequest)
 		return
-	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error adding new Todo item: %v", err), http.StatusBadRequest)
 	}
 	newTodo.ID = id
 
@@ -105,7 +39,7 @@ func createTodoItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get all TODO items
-func getTodoItems(w http.ResponseWriter, r *http.Request) {
+func GetAll(w http.ResponseWriter, r *http.Request) {
 	var todoItems []TodoItem
 
 	rows, err := db.Query("SELECT * FROM todo_item")
@@ -132,7 +66,7 @@ func getTodoItems(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update a TODO item
-func updateTodoItem(w http.ResponseWriter, r *http.Request) {
+func Update(w http.ResponseWriter, r *http.Request) {
 	var updatedTodo TodoItem
 	err := json.NewDecoder(r.Body).Decode(&updatedTodo)
 	if err != nil || updatedTodo.Name == "" || updatedTodo.Description == "" {
@@ -169,7 +103,7 @@ func updateTodoItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete a TODO item
-func deleteTodoItem(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	idParam := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idParam)
