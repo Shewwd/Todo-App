@@ -5,7 +5,7 @@ import { useState } from "react";
 interface Props {
     show: boolean,
     close: () => void,
-    saveItem: (item: TodoItem) => void
+    saveItem: (newItem: TodoItem) => void
 }
 
 const AddItemModal = (props: Props) => {
@@ -25,22 +25,29 @@ const AddItemModal = (props: Props) => {
     function handleSave(event: React.FormEvent) {
         event.preventDefault();  // Prevent page reload
 
+        if (!validateForm()) {
+            return;
+        }
+
+        const newItem = new TodoItem(-1, name!, description!);
+        props.saveItem(newItem);
+
+        handleClose();
+    };
+
+    function validateForm(): boolean {
         if (name.trim() === "") {
             alert("Item Name is required.");
-            return;
+            return false;
         }
 
         if (description.trim() === "") {
             alert("Item Description is required.");
-            return;
+            return false;
         }
 
-        const item = new TodoItem(-1, name!, description!);
-
-        props.saveItem(item);
-        handleClose();
-    };
-
+        return true;
+    }
 
     return (
         <Modal show={props.show} onHide={handleClose} centered backdrop="static">
@@ -49,7 +56,6 @@ const AddItemModal = (props: Props) => {
                     <Modal.Title>Add TODO Item</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    
                     <Form.Group className="mb-3" controlId="formName">
                             <Form.Label>Item Name</Form.Label>
                             <Form.Control required type="text" placeholder="Enter Item Name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -58,7 +64,6 @@ const AddItemModal = (props: Props) => {
                             <Form.Label>Item Description</Form.Label>
                             <Form.Control required type="text" placeholder="Enter Item Description" value={description} onChange={(e) => setDescription(e.target.value)} />
                         </Form.Group>
-                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>Close</Button>
